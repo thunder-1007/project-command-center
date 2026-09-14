@@ -159,7 +159,7 @@ function Stat({
   label: string;
   value: number;
   icon: React.ElementType;
-  tone?: "warn";
+  tone?: "warn" | undefined;
 }) {
   return (
     <div className="rounded-md border border-border bg-card p-4">
