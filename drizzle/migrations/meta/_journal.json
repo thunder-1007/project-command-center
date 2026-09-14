@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789397376363,
+      "tag": "0000_formiva_mission_control_core",
+      "breakpoints": true
+    }
+  ]
 }
