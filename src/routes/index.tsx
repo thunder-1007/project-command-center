@@ -74,9 +74,7 @@ function Landing() {
             <Link to="/auth">Open the dashboard</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link to="/auth" search={{ mode: "signup" }}>
-              Create an account
-            </Link>
+            <Link to="/auth">Create an account</Link>
           </Button>
         </div>
 
