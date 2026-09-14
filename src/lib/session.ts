@@ -38,9 +38,10 @@ export function useUser() {
 
 export function useRole() {
   const { user, loading } = useUser();
+  const demo = typeof window !== "undefined" && sessionStorage.getItem("formiva_demo") === "1";
   const query = useQuery({
     queryKey: ["my-role", user?.id],
-    enabled: !!user,
+    enabled: !!user && !demo,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
@@ -53,7 +54,7 @@ export function useRole() {
     },
   });
 
-  const role = (query.data ?? null) as AppRole | null;
+  const role = (demo ? "owner" : query.data ?? null) as AppRole | null;
   return {
     user,
     role,

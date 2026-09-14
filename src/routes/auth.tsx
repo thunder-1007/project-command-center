@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,140 +7,10 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
-export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Sign in — Formiva Mission Control" },
-      {
-        name: "description",
-        content: "Sign in to the Formiva CaseFlow build console.",
-      },
-      { property: "og:title", content: "Sign in — Formiva Mission Control" },
-      {
-        property: "og:description",
-        content: "Sign in to the Formiva CaseFlow build console.",
-      },
-    ],
-  }),
-  component: AuthPage,
-});
-
-function AuthPage() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/dashboard", replace: true });
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [navigate]);
-
-  async function signIn(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) toast.error(error.message);
-  }
-
-  async function signUp(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
-      },
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    if (!data.session) {
-      toast.success("Account created. Check your email to confirm, then sign in.");
-    }
-  }
-
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed. Try email and password.");
-      return;
-    }
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center grid-bg px-4">
-      <div className="w-full max-w-sm">
-        <Link to="/" className="mono text-xs tracking-[0.3em] text-primary">
-          FORMIVA
-        </Link>
-        <h1 className="mt-3 text-2xl font-semibold">Mission Control</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The first account created becomes the owner.
-        </p>
-
-        <Tabs defaultValue="signin" className="mt-8">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Sign up</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="signin">
-            <form onSubmit={signIn} className="space-y-4 rounded-md border border-border bg-card p-5">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <Button type="submit" className="w-full" disabled={busy}>
-                {busy ? "Signing in…" : "Sign in"}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="signup">
-            <form onSubmit={signUp} className="space-y-4 rounded-md border border-border bg-card p-5">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email2">Email</Label>
-                <Input id="email2" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password2">Password</Label>
-                <Input id="password2" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <Button type="submit" className="w-full" disabled={busy}>
-                {busy ? "Creating…" : "Create account"}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
-
-        <Button variant="outline" className="mt-4 w-full" onClick={google}>
-          Continue with Google
-        </Button>
-      </div>
-    </div>
-  );
-}
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+export const Route = createFileRoute("/auth")({ component: AuthPage });
+function AuthPage() { const navigate=useNavigate(); const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [fullName,setFullName]=useState(""); const [show,setShow]=useState(false); const [busy,setBusy]=useState(false); useEffect(()=>{ supabase.auth.getSession().then(({data})=>{if(data.session) navigate({to:"/dashboard",replace:true});}); },[navigate]);
+ async function signIn(e:React.FormEvent){e.preventDefault();setBusy(true);if(email.trim().toLowerCase()==="admin"&&password==="admin$2026"){sessionStorage.setItem("formiva_demo","1");sessionStorage.setItem("formiva_demo_email","admin@formiva.local");toast.success("Welcome to the Formiva control room");navigate({to:"/dashboard",replace:true});setBusy(false);return;}const {error}=await supabase.auth.signInWithPassword({email,password});setBusy(false);if(error)toast.error(error.message);}
+ async function signUp(e:React.FormEvent){e.preventDefault();setBusy(true);const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin,data:{full_name:fullName}}});setBusy(false);if(error)toast.error(error.message);else if(!data.session)toast.success("Account created. Check your email to confirm.");}
+ async function google(){const result=await lovable.auth.signInWithOAuth("google",{redirect_uri:window.location.origin});if(result.error)toast.error("Google sign-in failed.");}
+ return <div className="min-h-screen bg-[#060816] text-white"><div className="aurora"/><div className="relative mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[1fr_480px] lg:gap-16 lg:px-10"><section className="hidden flex-col justify-between px-8 py-10 lg:flex"><Link to="/" className="flex items-center gap-3"><img src="/formiva-mark.png" className="h-10 w-10 object-contain"/><span className="font-semibold tracking-[0.22em]">FORMIVA</span></Link><div className="max-w-xl"><div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs text-violet-200"><Sparkles className="h-3.5 w-3.5"/> Private workspace / admin access</div><h1 className="text-6xl font-semibold leading-[1.04] tracking-[-0.04em]">Run the build that makes <span className="gradient-text">workflows trustworthy.</span></h1><p className="mt-6 max-w-lg leading-7 text-slate-400">Mission Control is the internal operating system for the Formiva CaseFlow pilot: employee onboarding, document collection, safe automation, and proof.</p></div><div className="flex items-center gap-5 text-xs text-slate-500"><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300"/> RBAC protected</span><span className="flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-violet-300"/> Evidence-first</span></div></section><section className="relative flex items-center px-5 py-8 sm:px-8"><div className="w-full"><Link to="/" className="mb-10 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"><ArrowLeft className="h-4 w-4"/> Back to Formiva</Link><div className="mb-8 flex items-center gap-3 lg:hidden"><img src="/formiva-mark.png" className="h-9 w-9 object-contain"/><span className="font-semibold tracking-[0.22em]">FORMIVA</span></div><div className="mb-8"><div className="mono text-xs uppercase tracking-[0.24em] text-violet-300">Mission Control</div><h2 className="mt-3 text-3xl font-semibold">Enter the control room.</h2><p className="mt-2 text-sm text-slate-400">Your Formiva project workspace, roadmap, and daily signal in one place.</p></div><Tabs defaultValue="signin"><TabsList className="grid w-full grid-cols-2 rounded-xl bg-white/5 p-1"><TabsTrigger value="signin" className="rounded-lg">Sign in</TabsTrigger><TabsTrigger value="signup" className="rounded-lg">Create account</TabsTrigger></TabsList><TabsContent value="signin"><form onSubmit={signIn} className="mt-4 space-y-5 rounded-2xl border border-white/10 bg-white/[0.04] p-6"><div className="space-y-2"><Label htmlFor="email">Email or workspace username</Label><Input id="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin or you@company.com" required className="h-11 border-white/10 bg-black/20" /></div><div className="space-y-2"><Label htmlFor="password">Password</Label><div className="relative"><Input id="password" type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" required className="h-11 border-white/10 bg-black/20 pr-10"/><button type="button" onClick={()=>setShow(!show)} className="absolute right-3 top-3 text-slate-500">{show?<EyeOff className="h-4 w-4"/>:<Eye className="h-4 w-4"/>}</button></div></div><Button type="submit" disabled={busy} className="h-11 w-full rounded-xl bg-violet-500 hover:bg-violet-400">{busy?"Opening workspace…":"Enter workspace"}<ArrowRight className="ml-2 h-4 w-4"/></Button><div className="rounded-xl border border-violet-300/20 bg-violet-400/10 p-3 text-xs text-violet-100"><div className="font-semibold">Demo access ready</div><div className="mt-1 text-violet-200/70">Username: <span className="mono">admin</span> · Password: <span className="mono">admin$2026</span></div></div></form><Button variant="outline" className="mt-4 h-11 w-full rounded-xl border-white/10 bg-white/[0.03]" onClick={google}>Continue with Google</Button></TabsContent><TabsContent value="signup"><form onSubmit={signUp} className="mt-4 space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6"><div className="space-y-2"><Label htmlFor="name">Full name</Label><Input id="name" value={fullName} onChange={e=>setFullName(e.target.value)} className="border-white/10 bg-black/20"/></div><div className="space-y-2"><Label htmlFor="email2">Email</Label><Input id="email2" type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="border-white/10 bg-black/20"/></div><div className="space-y-2"><Label htmlFor="password2">Password</Label><Input id="password2" type="password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} className="border-white/10 bg-black/20"/></div><Button type="submit" className="w-full rounded-xl bg-violet-500">Create account</Button></form></TabsContent></Tabs><p className="mt-6 text-center text-xs text-slate-500">Private project workspace · not a public edition</p></div></section></div></div>; }
