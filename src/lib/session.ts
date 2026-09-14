@@ -17,6 +17,11 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (sessionStorage.getItem("formiva_demo") === "1") {
+      setUser({ id: "demo-owner", email: sessionStorage.getItem("formiva_demo_email") ?? "admin@formiva.local" } as User);
+      setLoading(false);
+      return;
+    }
     let active = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
